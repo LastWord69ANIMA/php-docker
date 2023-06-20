@@ -1,0 +1,27 @@
+name: Monthly Code Execution
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  execute_code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Execute PHP code
+        run: |
+          php login_delete.php
