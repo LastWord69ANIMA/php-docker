@@ -1,8 +1,8 @@
 <?php
 // DB接続設定
-$dsn = 'mysql:dbname=*******;host=localhost';
-$user = '********';
-$password = '*******';
+$dsn = 'mysql:dbname=*****;host=localhost';
+$user = '*****';
+$password = '*****';
 $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 
 //テーブル作成(掲示板画面)
@@ -13,14 +13,12 @@ $sql = "CREATE TABLE IF NOT EXISTS  MainTable"
 . "num_comment INT ,"
 . "comment TEXT ,"
 . "date TEXT ,"
-. "password TEXT"
+. "password TEXT ,"
+. " image_file TEXT ,"
+. " audio_file TEXT "
 . ");";
 $stmt = $pdo->query($sql);
 
-$sql = "ALTER TABLE MainTable "
-."ADD image_file TEXT, "
-."ADD audio_file TEXT";
-$stmt = $pdo->query($sql);
 
 
 //テーブル作成(ログイン画面)
@@ -156,14 +154,20 @@ if( !empty( $_POST["edit_num"] )&& !empty( $_POST["edit_name"] )&& !empty( $_POS
     $stmt->execute();
 
 }
-
-
-
+if (!empty($_POST["name"]) || !empty($_POST["comment"]) || !empty($_POST["pass"]) 
+    || !empty($_POST["delete"]) || !empty($_POST["del_pass"])
+    || !empty($_POST["edit"]) || !empty($_POST["edit_pass"])) {
+    echo '入力エラーです。';
+}
 
 //以下、投稿データの表示
     $sql = "SELECT * FROM MainTable";
     $stmt = $pdo->query($sql);
     $results = $stmt->fetchAll();
+    
+    echo '<div class="split-box above-box">';
+    echo '<span>';
+    
     foreach ($results as $row) {
         // テキストデータの表示
         echo $row['id'].' - ';
@@ -185,9 +189,11 @@ if( !empty( $_POST["edit_num"] )&& !empty( $_POST["edit_name"] )&& !empty( $_POS
         }
     
         echo "<hr>";
-    }
+        }
     echo "<hr>";
-
+    
+echo '</span>';
+echo '</div>';
 
 
 ?>
@@ -196,71 +202,200 @@ if( !empty( $_POST["edit_num"] )&& !empty( $_POST["edit_name"] )&& !empty( $_POS
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" >
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <!-- CSS読み込み -->
-    <link rel="stylesheet" href="main.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href='main.css' >
 
+<style>
+.filelabel{
+    position: relative;
+    background-color: #ff5722;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.5s;
+    opacity:0.5;
+}
+.filelabel:hover{
+    background-color: #004db1;
+}
+  
+.fileinput{
+    display: none;
+}
+  
+.size-image {
+    max-width: 100%;
+    height: auto;  
+}
+
+
+.below-box {
+    position: fixed;
+    bottom: 90px;
+    width: 100%;
+    background-color: rgba(245, 245, 245, 0.1);
+    border-top: 1px solid #ccc;
+    padding: 1px;
+}
+
+@media screen and (max-width: 900px) {
+    /* 画面幅が900pxだと送信ボタンが表示されない。 */
+    .below-box {
+        bottom: 30px; 
+    }
+}
+
+body {
+    background-color: #999;
+}
+  
+ 
+textarea {
+    padding: 10px;
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 1.5;
+    height: 100px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 1px #999;
+    opacity:0.5;
+    color:red;
+    resize: none;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: row;
+}
+.form-container form > * {
+  margin-right: 10px;
+}
+
+
+#name{
+    padding: 10px;
+    max-width: 100%;
+    line-height: 1.5;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 1px #999;
+    
+}
+
+label {
+      display: block;
+      margin-bottom: 10px;
+}
+
+footer {
+  background-color: #f0f0f0;
+  text-align: center;
+  padding: 10px;
+}
+
+input[type="text"] {
+  opacity: 0.4;
+  color:red;
+}
+input[type="file"] {
+  opacity: 0.4;
+}
+input[type="password"] {
+  opacity: 0.4;
+  color:red;
+}
+input[type="number"] {
+  opacity: 0.4;
+  color:red;
+}
+input[type="submit"] {
+  opacity: 0.4;
+}
+  
+</style>
 
     <title>Mission_6-1</title>
 </head>
 <body>
-<div class="container">
-    <h1 class="chapter">Mission_6-1</h1>
-    <p>※画像・音声を投稿する際、コメントも付記して下さい。</p>
-    <p>※画像・音声を投稿する際、利用規約にご留意ください。</p>
-</div>
+<div class="split-box below-box">
 
-    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+
+
+    <div class="form-container">
     <form action="" method="post" enctype="multipart/form-data">
-    <input id="name" type="text" name="name" placeholder="名前" required><br>
+    <div>
+    <input id="name" type="text" name="name" placeholder="名前"  required><br>
     
-    <textarea id="cooment"　type="text" name="comment" placeholder="コメント(必須)" required autocorrect="on" wrap="hard" cols="25"></textarea><br><br> 
-    
+    <textarea id="cooment"　type="text" name="comment" placeholder="コメント(必須)" required autocorrect="on" wrap="hard" cols="40" row="100"></textarea><br><br> 
+    </div>
     <label for="image" class="filelabel">画像ファイル選択</label>
     <input type="file" name="image" id="image" class="fileinput"><br><br> 
     
     <label for="audio" class="filelabel">音声ファイル選択</label>
     <input type="file" name="audio" id="audio" class="fileinput"><br><br>  
     
+    <div>
     <input type="password" name="pass" placeholder="ログイン時のパスワード" class="pass"><br><br>
-    <input type="submit" name="submit" class="btn_passview" onclick="togglePassword()">
+    <input type="submit" name="submit" class="btn_passview" onclick="togglePassword()"　onsubmit="showConfirmation()">
     </form>
     </div>
 
-    <div class="d-flex justify-content-center align-items-center" style="height: 20vh;">
+
+    
     <form action="" method="post">    
-        <input type="number" name="delete"  placeholder="削除対象番号"><br>
+        <input type="number" name="delete"  placeholder="削除対象番号" size="7"><br>
+    <div>
         <input type="text" name="del_pass" placeholder="パスワード:必須" class="pass"><br><br>
     <input type="submit" name="submit" class="btn_passview" onclick="togglePassword()">
     </form>
     </div>
 
-    <div class="d-flex justify-content-center align-items-center" style="height: 20vh;">
+
+    
     <form method="post" action="">
-        <input type="number" name="edit" placeholder="編集対象番号"><br>
+        <input type="number" name="edit" placeholder="編集対象番号" size="7"><br>
+    <div>
         <input type="text" name="edit_pass" placeholder="パスワード:必須" class="pass"><br><br>
         <input type="submit" name="submit" class="btn_passview" onclick="togglePassword()">
     </form>
     </div>
 
-    <div class="d-flex justify-content-center align-items-center" style="height: 10vh;">
+
+    
     <form method="post" action="">
-        <?php if (isset($edit_num)) { echo '<input type="number" name="edit_num" value="'.$edit_num.'">'; } ?><br>
+        <?php if (isset($edit_num)) { echo '<input type="number" name="edit_num" value="'.$edit_num.' ">'; } ?><br>
         <?php if (isset($edit_name)) { echo '<input type="text" name="edit_name" value="'.$edit_name.'">'; } ?><br>
         <?php if (isset($edit_comment)) { echo '<textarea type="text" name="edit_comment" value="'.$edit_comment.'"></textarea>'; } ?><br>
         <br>
         <?php if (isset($edit_num)) { echo '<input type="submit" name="submit">'; } ?>
+        <div>
     </form> 
-</div>
-    <script src="main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        </div>
+
+
+
     
+</div>
+</div>
+
+
+
+
+    <script src='main.js'>
+        function showConfirmation() {
+    alert("※画像・音声を投稿する際、コメントも付記して下さい。\n※画像・音声を投稿する際、利用規約にご留意ください。");
+}
+    </script>
+    
+    <footer>
     <button onclick="location.href='main.php'">スレッド作成へ</button>
     <button onclick="location.href='main_sub.php'">スレッド一覧へ</button>
+    <button onclick="location.href='welcom_site/welcom_site.php'">水先案内サイトへ</button>
+    </footer>
         
 </body>
 </html>
