@@ -1,8 +1,8 @@
 <?php
 // DB接続設定
 $dsn = 'mysql:dbname=*****;host=localhost';
-$user = '*****';
-$password = '******';
+$user = '*******';
+$password = '*******';
 $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 
 //以下、最小要件実装編とはテーブル名が異なります。

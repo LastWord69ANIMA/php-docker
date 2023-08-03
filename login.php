@@ -2,7 +2,7 @@
 // DB接続設定
 $dsn = 'mysql:dbname=******;host=localhost';
 $user = '******';
-$password = '*****';
+$password = '******';
 $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 
 //以下、最小要件実装編とはテーブル名が異なります。
@@ -34,7 +34,6 @@ $stmt = $pdo->query($sql);
     if(!empty($NewUserName) && !empty($NewPassword)){
         $sql = $pdo->prepare("INSERT INTO ".$DatabaseName." (name, password) VALUES (:name, :password)");
         $sql->bindParam(':name', $name, PDO::PARAM_STR);
-        //$sql->bindParam(':password', $password, PDO::PARAM_STR);
         
         //パスワードのハッシュ化
         $hashedPassword = password_hash($NewPassword, PASSWORD_DEFAULT);
@@ -63,9 +62,9 @@ $stmt = $pdo->query($sql);
     if(!empty($UserName) && !empty($Password)){
             
         $sql = 'SELECT * FROM '.$DatabaseName.' WHERE name="'.$UserName.'"';
-        $stmt = $pdo->prepare($sql);                  // ←差し替えるパラメータを含めて記述したSQLを準備し、
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT); // ←その差し替えるパラメータの値を指定してから、
-        $stmt->execute();                             // ←SQLを実行する。
+        $stmt = $pdo->prepare($sql);                  // 差し替えるパラメータを含めて記述したSQLを準備し、
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT); // その差し替えるパラメータの値を指定してから、
+        $stmt->execute();                             // SQLを実行する。
         $results = $stmt->fetchAll();
         $CorrectPass = $results[0]['password'];
         
@@ -79,7 +78,8 @@ $stmt = $pdo->query($sql);
             $stmt->bindParam(':name', $UserName, PDO::PARAM_STR);
             $stmt->execute();
             
-            header("Location: Mission_6-1.php"); // ページ遷移
+            // ページ遷移
+            header("Location: Mission_6-1.php"); 
             $success = true;
         }
     }
@@ -96,13 +96,15 @@ $stmt = $pdo->query($sql);
         
         <form method="POST">
             <p>新規登録</p>
+            <h4>※登録されたパスワードは本サイトでの投稿や削除にて必要となるので、ご自身で管理のほどお願いします。</h4>
             <input class="nameandpass" type="text" name="NewUserName" Placeholder='ユーザー名'><br>
             <input class='nameandpass' type='text' name='NewPassword' Placeholder='パスワード'><br>
             <button class='button' type='submit'>登録</button>
         </form>
         <?php
             if(!empty($NewUserName) && !empty($NewPassword) && $add==true){
-                echo "<h3>ユーザー名：".$NewUserName."、パスワード：".$NewPassword." を登録しました</h3>";
+                //echo "<h3>ユーザー名：".$NewUserName."、パスワード：".$NewPassword." を登録しました</h3>";
+                echo "<h3>ユーザー名とパスワードを登録しました。</h3>";
             }
         ?>
         <br>
