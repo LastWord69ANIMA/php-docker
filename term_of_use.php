@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 </p>
-        <!-- 利用規約の長い内容を適切に配置 -->
+      
       </div>
     </div>
     <div class="agreement">
