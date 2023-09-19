@@ -1,0 +1,31 @@
+version: '2'
+services:
+  php:
+    build: .
+    depends_on:
+      - mysql
+    volumes:
+      - ./Mission_6-1:/var/www/html
+      - ./php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - 8080:80
+  mysql:
+    image: mysql
+    volumes:
+      - "./mysql:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    links:
+      - mysql
+    ports:
+      - 4040:80
+    volumes:
+      - /sessions
